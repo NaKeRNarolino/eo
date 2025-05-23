@@ -1,0 +1,1 @@
+## `eo` is a library with various stuff for my projects
