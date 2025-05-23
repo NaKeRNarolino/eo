@@ -2,6 +2,7 @@ pub mod notifiers;
 
 pub use macros::infix;
 pub use macros::notifier;
+pub use macros::reactive_value;
 
 #[cfg(test)]
 mod tests {
