@@ -1,12 +1,15 @@
 pub mod notifiers;
 pub mod logger;
 pub mod events;
+pub mod sjson;
 
 pub use macros::event;
 pub use macros::event_init;
 pub use macros::infix;
 pub use macros::notifier;
 pub use macros::reactive_value;
+pub use macros::sjson;
+pub use macros::sjson_value;
 
 #[cfg(test)]
 mod tests {
@@ -15,8 +18,9 @@ mod tests {
 
     use crate::logger::EoLogger;
     use eo::notifier;
-    use macros::{event_init, infix, reactive_value};
+    use macros::{event_init, infix, reactive_value, sjson, sjson_value};
     use std::sync::RwLock;
+    use crate::sjson::{SJsonElement, SJsonValue};
 
     #[test]
     fn test() {
@@ -37,6 +41,33 @@ mod tests {
 
         let event = event_init!(i32);
 
+        SJsonElement {
+            id: "hi".to_string(),
+            params: SJsonValue::String("Hi!".to_string())
+        };
+
+        let ident = sjson_value!(12.3);
+
+        let x = sjson! {
+            hi:x = "Hi",
+            minecraft:icon = "icon_id",
+            minecraft:damage {
+                value = 7,
+                add {
+                   hi = $ident
+                }
+            },
+            eo [
+                "hi",
+                {
+                    woah = "hi",
+                    nested {
+                        objects = true
+                    }
+                }
+            ]
+        };
+        
         infix! {
             event subscribe |x| {
                 println!("Got {x}!")

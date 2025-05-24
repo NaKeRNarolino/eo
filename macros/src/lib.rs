@@ -1,5 +1,6 @@
 mod notifier_macros;
 mod event_macro;
+mod sjson;
 
 use proc_macro2::TokenTree;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -10,6 +11,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use crate::event_macro::{EventInitMacro, EventMacro};
 use crate::notifier_macros::{NotifierCreation, ReactiveValueCreation};
+use crate::sjson::{SJsonMacro, SimplifiedSJsonMacro};
 
 /// Helper macro to create [Notifier]s in a cleaner way.
 /// Examples:
@@ -92,11 +94,59 @@ pub fn event_init(token_stream: proc_macro::TokenStream) -> proc_macro::TokenStr
 }
 
 
+/// Macro for mimicking the infix functions from Kotlin
+/// ```rust
+/// use macros::infix;
+///
+/// let mut str = String::from("");
+///
+/// infix! {
+///     str push_str "Hi!"
+/// }
+/// ```
 #[proc_macro]
 pub fn infix(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let infixes = parse_macro_input!(tks as InfixCollection);
 
     quote! { #infixes }.into()
+}
+
+/// Macro for writing sJSON structures.
+/// Read more about sJSON on the eo wiki.
+/// ```rust
+/// use macros::{sjson, sjson_value};
+///
+/// let v = sjson_value!(12.3);
+///
+/// let x = sjson! {
+///     object {
+///         value = "hi",
+///         variable = $v,
+///         nested_array [
+///             {
+///                 value = "sJSON stuff"
+///             }
+///         ]
+///     }
+/// };
+/// ```
+#[proc_macro]
+pub fn sjson(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let p = parse_macro_input!(tks as SJsonMacro);
+
+    quote! { #p }.into()
+}
+
+/// A macro for easier creation of sJSON value types. Use this instead of SJsonValue, unless necessary.
+/// ```rust
+/// use macros::sjson_value;
+/// let x = sjson_value!(12.3);
+/// ```
+#[proc_macro]
+pub fn sjson_value(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let p = parse_macro_input!(tks as SimplifiedSJsonMacro);
+
+    quote! { #p }.into()
 }
 
 struct InfixStatement {
