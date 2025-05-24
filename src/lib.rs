@@ -1,6 +1,6 @@
 pub mod notifiers;
-mod logger;
-mod events;
+pub mod logger;
+pub mod events;
 
 pub use macros::event;
 pub use macros::event_init;
