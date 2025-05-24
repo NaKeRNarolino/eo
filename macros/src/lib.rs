@@ -1,13 +1,14 @@
 mod notifier_macros;
+mod event_macro;
 
 use proc_macro2::TokenTree;
-use std::process::id;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{parse_macro_input, Expr, Token};
 use syn::__private::TokenStream2;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
+use crate::event_macro::{EventInitMacro, EventMacro};
 use crate::notifier_macros::{NotifierCreation, ReactiveValueCreation};
 
 /// Helper macro to create [Notifier]s in a cleaner way.
@@ -65,6 +66,31 @@ pub fn reactive_value(token_stream: proc_macro::TokenStream) -> proc_macro::Toke
 
     quote! { #parsed }.into()
 }
+
+/// A macro for easier creation of events
+///```rust
+///use macros::event;
+///event!(event i32);
+///```
+#[proc_macro]
+pub fn event(token_stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let p = parse_macro_input!(token_stream as EventMacro);
+
+    quote! { #p }.into()
+}
+
+/// A macro for easier initialization of events
+///```rust
+///use macros::event;
+///event!(event i32);
+///```
+#[proc_macro]
+pub fn event_init(token_stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let p = parse_macro_input!(token_stream as EventInitMacro);
+
+    quote! { #p }.into()
+}
+
 
 #[proc_macro]
 pub fn infix(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {

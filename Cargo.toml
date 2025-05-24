@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 macros = { path = "./macros" }
+log = "0.4.27"
+colored = "3.0.0"
