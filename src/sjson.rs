@@ -62,3 +62,57 @@ impl TransformHashMap for Vec<SJsonElement> {
         )
     }
 }
+
+pub trait ToSJson {
+    fn sjson(&self) -> SJsonValue;
+}
+
+impl ToSJson for String {
+    fn sjson(&self) -> SJsonValue {
+        SJsonValue::String(self.clone())
+    }
+}
+
+impl ToSJson for &str {
+    fn sjson(&self) -> SJsonValue {
+        SJsonValue::String(self.to_string())
+    }
+}
+
+impl ToSJson for bool {
+    fn sjson(&self) -> SJsonValue {
+        SJsonValue::Boolean(*self)
+    }
+}
+
+trait Number {}
+
+impl Number for f64 {}
+impl Number for i32 {}
+impl Number for i64 {}
+impl Number for u32 {}
+impl Number for u64 {}
+impl Number for usize {}
+impl Number for isize {}
+
+impl<T> ToSJson for T
+where
+    T: Number + Into<f64> + Copy {
+    fn sjson(&self) -> SJsonValue {
+        SJsonValue::Number((*self).into())
+    }
+}
+
+impl<T> ToSJson for Vec<T>
+where
+    T: ToSJson + Copy {
+    fn sjson(&self) -> SJsonValue {
+        SJsonValue::Array(self.iter().map(|x| (*x).sjson()).collect())
+    }
+}
+
+impl ToSJson for SJsonValue {
+    fn sjson(&self) -> SJsonValue {
+        self.clone()
+    }
+}

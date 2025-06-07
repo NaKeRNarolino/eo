@@ -20,7 +20,7 @@ mod tests {
     use eo::notifier;
     use macros::{event_init, infix, reactive_value, sjson, sjson_value};
     use std::sync::RwLock;
-    use crate::sjson::{SJsonElement, SJsonValue};
+    use crate::sjson::{SJsonElement, SJsonValue, ToSJson};
 
     #[test]
     fn test() {
@@ -54,11 +54,11 @@ mod tests {
             minecraft:damage {
                 value = 7,
                 add {
-                   hi = $ident
+                   hi = "hi"
                 }
             },
             eo [
-                "hi",
+                $ident,
                 {
                     woah = "hi",
                     nested {
