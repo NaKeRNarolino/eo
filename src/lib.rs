@@ -46,7 +46,7 @@ mod tests {
             params: SJsonValue::String("Hi!".to_string())
         };
 
-        let ident = sjson_value!(12.3);
+        let ident = 12.3;
 
         let x = sjson! {
             hi:x = "Hi",

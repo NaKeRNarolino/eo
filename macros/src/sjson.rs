@@ -124,7 +124,7 @@ impl ToTokens for SJsonValue {
                         ]))
                     }
                 },
-                SJsonValue::Variable(ident) => quote! { #ident },
+                SJsonValue::Variable(ident) => quote! { #ident.sjson() },
                 SJsonValue::Bool(v) => quote! { eo::sjson::SJsonValue::Boolean(#v) },
             }
         )
