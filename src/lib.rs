@@ -18,7 +18,7 @@ mod tests {
 
     use crate::logger::EoLogger;
     use eo::notifier;
-    use macros::{event_init, infix, reactive_value, sjson, sjson_value};
+    use macros::{event_init, infix, reactive_value, sjson};
     use std::sync::RwLock;
     use crate::sjson::{SJsonElement, SJsonValue, ToSJson};
 
@@ -49,7 +49,7 @@ mod tests {
         let ident = 12.3;
 
         let x = sjson! {
-            hi:x = "Hi",
+            hi:x.y = "Hi",
             minecraft:icon = "icon_id",
             minecraft:damage {
                 value = 7,

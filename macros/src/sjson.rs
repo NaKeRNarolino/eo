@@ -3,6 +3,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{braced, bracketed, Token};
+use syn::token::Token;
 
 pub struct SJsonMacro {
     jsons: Vec<SJsonElement>
@@ -35,11 +36,32 @@ impl Parse for SJsonMacro {
 
 impl Parse for SJsonElement {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let name_punct =
-            Punctuated::<Ident, Token![:]>::parse_separated_nonempty(input)?
-                .into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
+        // let name_punct =
+        //     Punctuated::<Ident, Token![:]>::parse_separated_nonempty(input)?
+        //         .into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
 
-        let name = name_punct.join(":");
+        let name_parsed = {
+            let mut parsed: Vec<String> = vec![];
+
+            while input.peek(Token![:]) || input.peek(Token![.]) || Ident::peek(input.cursor()) {
+                if input.peek(Token![:]) {
+                    input.parse::<Token![:]>()?;
+                    parsed.push(":".to_string());
+                }
+                if input.peek(Token![.]) {
+                    input.parse::<Token![.]>()?;
+                    parsed.push(".".to_string());
+                }
+                if Ident::peek(input.cursor()) {
+                    let a = input.parse::<Ident>()?;
+                    parsed.push(a.to_string());
+                }
+            }
+            
+            parsed
+        };
+
+        let name = name_parsed.join("");
 
         if input.peek2(syn::LitStr) || input.peek2(syn::LitFloat) ||
             input.peek2(syn::LitInt) || input.peek2(syn::LitBool) || input.peek2(Token![$]) {
