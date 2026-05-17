@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 use serde::{Serialize, Serializer};
 
 #[derive(Clone, Debug)]
@@ -8,6 +9,11 @@ pub enum SJsonValue {
     Boolean(bool),
     Object(HashMap<String, SJsonValue>),
     Array(Vec<SJsonValue>),
+}
+
+#[derive(Clone, Debug)]
+pub struct SJsonMacro {
+    pub vec: Vec<SJsonElement>
 }
 
 
@@ -60,6 +66,12 @@ impl TransformHashMap for Vec<SJsonElement> {
         HashMap::<String, SJsonValue>::from_iter(
             self.clone().into_iter().map(|x| (x.id, x.params))
         )
+    }
+}
+
+impl From<SJsonMacro> for HashMap<String, SJsonValue> {
+    fn from(value: SJsonMacro) -> Self {
+        value.vec.transform_hashmap()
     }
 }
 

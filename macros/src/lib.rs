@@ -134,7 +134,12 @@ pub fn infix(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {
 pub fn sjson(tks: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let p = parse_macro_input!(tks as SJsonMacro);
 
-    quote! { #p }.into()
+    quote! {
+        {
+            use eo::sjson::SJsonMacro;
+            SJsonMacro { vec: #p }
+        }
+    }.into()
 }
 
 /// A macro for easier creation of sJSON value types. Use this instead of SJsonValue, unless necessary.
