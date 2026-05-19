@@ -43,7 +43,7 @@ impl Parse for SJsonElement {
         let name_parsed = {
             let mut parsed: Vec<String> = vec![];
 
-            while input.peek(Token![:]) || input.peek(Token![.]) || Ident::peek(input.cursor()) {
+            while input.peek(Token![:]) || input.peek(Token![.]) || input.peek(Token![*]) || Ident::peek(input.cursor()) {
                 if input.peek(Token![:]) {
                     input.parse::<Token![:]>()?;
                     parsed.push(":".to_string());
@@ -51,6 +51,10 @@ impl Parse for SJsonElement {
                 if input.peek(Token![.]) {
                     input.parse::<Token![.]>()?;
                     parsed.push(".".to_string());
+                }
+                if input.peek(Token![*]) {
+                    input.parse::<Token![*]>()?;
+                    parsed.push("*".to_string());
                 }
                 if Ident::peek(input.cursor()) {
                     let a = input.parse::<Ident>()?;
