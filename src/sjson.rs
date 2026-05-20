@@ -67,14 +67,17 @@ impl SJsonMacro {
         let filter_dir: Vec<(String, String)> = self.vec.iter().cloned().filter_map(|v| v.direct ).collect();
         let mapped = filter.transform_hashmap();
         let mut ser = serde_json::to_string_pretty(&mapped).unwrap();
+        ser = ser.strip_prefix('{').unwrap().strip_suffix('}').unwrap().to_string();
         for dir in filter_dir {
-            ser.push(',');
+            if (!ser.is_empty()) {
+                ser.push(',');
+            }
             ser.push_str(&format!(
                 "\"{}\": {}", dir.0, dir.1
             ));
         }
 
-        ser
+        format!("{{ {} }}", ser)
     }
 }
 
