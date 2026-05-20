@@ -47,7 +47,8 @@ impl Parse for SJsonElement {
             let inclusion = input.parse::<Expr>()?;
             let serialized = quote! { {
                 use serde_json::to_string;
-                (#inclusion.sjson_ident(), to_string(&#inclusion).unwrap())
+                let built = #inclusion;
+                (&built.sjson_ident(), to_string(&built).unwrap())
             } };
             return Ok(
                 SJsonElement {
