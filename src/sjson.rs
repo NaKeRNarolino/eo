@@ -11,17 +11,20 @@ pub enum SJsonValue {
     Array(Vec<SJsonValue>),
 }
 
+pub trait HasSJsonIdent {
+    fn sjson_ident() -> String;
+}
+
 #[derive(Clone, Debug)]
 pub struct SJsonMacro {
     pub vec: Vec<SJsonElement>
 }
 
-
 #[derive(Clone, Debug)]
 pub struct SJsonElement {
     pub id: String,
     pub params: SJsonValue,
-    pub direct: Option<String>,
+    pub direct: Option<(String, String)>,
 }
 
 // impl Serialize for SJsonElement {
@@ -61,12 +64,14 @@ impl Serialize for SJsonValue {
 impl SJsonMacro {
     pub fn serialize(&self) -> String {
         let filter: Vec<SJsonElement> = self.vec.iter().filter(|v| v.direct.is_none()).cloned().collect();
-        let filter_dir: Vec<String> = self.vec.iter().cloned().filter_map(|v| v.direct ).collect();
+        let filter_dir: Vec<(String, String)> = self.vec.iter().cloned().filter_map(|v| v.direct ).collect();
         let mapped = filter.transform_hashmap();
         let mut ser = serde_json::to_string_pretty(&mapped).unwrap();
         for dir in filter_dir {
             ser.push(',');
-            ser.push_str(&dir);
+            ser.push_str(&format!(
+                "\"{}\": {}", dir.0, dir.1
+            ));
         }
 
         ser

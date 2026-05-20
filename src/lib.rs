@@ -46,7 +46,6 @@ mod tests {
         let ident = 12.3;
 
         let x = sjson! {
-            @ident,
             hi:x.y = "Hi",
             minecraft:icon = "icon_id",
             minecraft:damage {
