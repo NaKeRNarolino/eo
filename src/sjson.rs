@@ -12,7 +12,7 @@ pub enum SJsonValue {
 }
 
 pub trait HasSJsonIdent {
-    fn sjson_ident() -> String;
+    fn sjson_ident(&self) -> String;
 }
 
 #[derive(Clone, Debug)]
