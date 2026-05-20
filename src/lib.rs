@@ -41,14 +41,12 @@ mod tests {
 
         let event = event_init!(i32);
 
-        SJsonElement {
-            id: "hi".to_string(),
-            params: SJsonValue::String("Hi!".to_string())
-        };
+
 
         let ident = 12.3;
 
         let x = sjson! {
+            @ident,
             hi:x.y = "Hi",
             minecraft:icon = "icon_id",
             minecraft:damage {
@@ -67,7 +65,8 @@ mod tests {
                 }
             ]
         };
-        
+
+
         infix! {
             event subscribe |x| {
                 println!("Got {x}!")

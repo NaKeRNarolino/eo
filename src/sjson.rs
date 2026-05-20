@@ -20,7 +20,8 @@ pub struct SJsonMacro {
 #[derive(Clone, Debug)]
 pub struct SJsonElement {
     pub id: String,
-    pub params: SJsonValue
+    pub params: SJsonValue,
+    pub direct: Option<String>,
 }
 
 // impl Serialize for SJsonElement {
@@ -54,6 +55,21 @@ impl Serialize for SJsonValue {
                 v.serialize(s)
             }
         }
+    }
+}
+
+impl SJsonMacro {
+    pub fn serialize(&self) -> String {
+        let filter: Vec<SJsonElement> = self.vec.iter().filter(|v| v.direct.is_none()).cloned().collect();
+        let filter_dir: Vec<String> = self.vec.iter().cloned().filter_map(|v| v.direct ).collect();
+        let mapped = filter.transform_hashmap();
+        let mut ser = serde_json::to_string_pretty(&mapped).unwrap();
+        for dir in filter_dir {
+            ser.push(',');
+            ser.push_str(&dir);
+        }
+
+        ser
     }
 }
 

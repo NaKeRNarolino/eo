@@ -2,7 +2,7 @@ use proc_macro2::{Delimiter, Ident, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{braced, bracketed, Token};
+use syn::{braced, bracketed, Expr, Token};
 use syn::token::Token;
 
 pub struct SJsonMacro {
@@ -12,7 +12,8 @@ pub struct SJsonMacro {
 #[derive(Clone)]
 struct SJsonElement {
     id: String,
-    value: SJsonValue
+    value: SJsonValue,
+    direct_inclusion: Option<TokenStream>,
 }
 
 
@@ -39,6 +40,23 @@ impl Parse for SJsonElement {
         // let name_punct =
         //     Punctuated::<Ident, Token![:]>::parse_separated_nonempty(input)?
         //         .into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
+
+
+        if input.peek(Token![@]) {
+            input.parse::<Token![@]>()?;
+            let inclusion = input.parse::<Expr>()?;
+            let serialized = quote! { {
+                use serde_json::to_string;
+                to_string(&#inclusion).unwrap()
+            } };
+            return Ok(
+                SJsonElement {
+                    id: "".to_string(),
+                    value: SJsonValue::Bool(false),
+                    direct_inclusion: Some(serialized)
+                }
+            )
+        }
 
         let name_parsed = {
             let mut parsed: Vec<String> = vec![];
@@ -76,7 +94,8 @@ impl Parse for SJsonElement {
 
         Ok(SJsonElement {
             id: name,
-            value
+            value,
+            direct_inclusion: None
         })
     }
 }
@@ -184,13 +203,26 @@ impl From<SJsonElement> for SJsonElementHashMap {
 
 impl ToTokens for SJsonElement {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let SJsonElement { id, value } = self;
-        tokens.append_all(quote! {
-            eo::sjson::SJsonElement {
-                id: #id.to_string(),
-                params: #value
-            }
-        })
+        let SJsonElement { id, value, direct_inclusion } = self;
+        if let Some(inc) = direct_inclusion {
+            tokens.append_all(
+                quote! {
+                    eo::sjson::SJsonElement {
+                        id: "".to_string(),
+                        params: SJsonValue::Boolean(false),
+                        direct: Some(#inc)
+                    }
+                }
+            );
+        } else {
+            tokens.append_all(quote! {
+                eo::sjson::SJsonElement {
+                    id: #id.to_string(),
+                    params: #value,
+                    direct: None
+                }
+            })
+        }
     }
 }
 
