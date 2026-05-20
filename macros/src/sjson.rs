@@ -42,8 +42,8 @@ impl Parse for SJsonElement {
         //         .into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
 
 
-        if input.peek(Token![@]) {
-            input.parse::<Token![@]>()?;
+        if input.peek(Token![:]) {
+            input.parse::<Token![:]>()?;
             let inclusion = input.parse::<Expr>()?;
             let serialized = quote! { {
                 use serde_json::to_string;
